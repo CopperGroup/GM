@@ -1,20 +1,29 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
+import { Store } from "@/constants/store.js";
 
 let isConnected = false;
 
 export async function connectToDB() {
-    mongoose.set("strictQuery", true);
+  mongoose.set("strictQuery", true);
 
-    if(!process.env.MONGODB_URL) return console.log("MONGODB_URL not found");
-    if(isConnected) return console.log("Already connected to MongoDB")
+  if (!process.env.MONGODB_URL) {
+    console.log("MONGODB_URL not found");
+    return;
+  }
 
-    try {
-        await mongoose.connect(process.env.MONGODB_URL);
+  if (isConnected) {
+    console.log("Already connected to MongoDB");
+    return;
+  }
 
-        isConnected = true;
+  try {
+    const uri = `${process.env.MONGODB_URL}${Store.database}?retryWrites=true&w=majority&appName=PlanetaBazannia`;
+    console.log(uri)
+    await mongoose.connect(uri);
 
-        console.log("Connected to MongoDB");
-    } catch(error) {
-        console.log(error);
-    }
+    isConnected = true;
+    console.log(`Connected to MongoDB database: ${Store.database}`);
+  } catch (error) {
+    console.log("Error connecting to MongoDB:", error);
+  }
 }
