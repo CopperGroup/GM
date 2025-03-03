@@ -18,8 +18,10 @@ export async function connectToDB() {
 
   try {
     const uri = `${process.env.MONGODB_URL}${Store.database}?retryWrites=true&w=majority&appName=PlanetaBazannia`;
-    console.log(uri)
     await mongoose.connect(uri);
+
+    const TestModel = mongoose.model('CreateDB', new mongoose.Schema({ name: String }));
+    await TestModel.create({ name: 'CreateDB' })
 
     isConnected = true;
     console.log(`Connected to MongoDB database: ${Store.database}`);
